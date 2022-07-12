@@ -225,7 +225,7 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <p>
-            Archibus Connect
+            API Gateway Portal
           </p>
         </header>
         <body className='App-body'>
