@@ -18,18 +18,18 @@ const FormMetadata = [
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      formData: {
-        buildingId: '',
-        buildingName: '',
-        floorId: '',
-        floorName: '',
-        fileType: 'json',
-        isFlatFile: 'yes',
-      },
-      result: '',
-      isLoading: false
-     };
+    // this.state = { 
+    //   formData: {
+    //     buildingId: '',
+    //     buildingName: '',
+    //     floorId: '',
+    //     floorName: '',
+    //     fileType: 'json',
+    //     isFlatFile: 'yes',
+    //   },
+    //   result: '',
+    //   isLoading: false
+    //  };
      this.formHandler = new FormHandler(this, FormMetadata, azureApiUrl);
   }
 

@@ -1,6 +1,21 @@
 
 class FormHandler {
-  constructor(context_passthru, FormMetadata, api_url) {
+  constructor(context_passthru, FormMetadata, ApiUrl, ApiFormMappings = {}) {
+    this.mapApiForm = formData => ({
+      building: {
+        bl_id: formData.buildingId,
+        name: {
+          contains: formData.buildingName
+        },
+        banner_name_abrev: formData.bannerName
+      },
+      floor: {
+        fl_id: formData.floorId,
+        name: formData.floorName
+      },
+      flat_file: formData.isFlatFile,
+      file_type: formData.fileType,
+    });
     // todo: once refactor works use default form state for init
     // this.context_passthru.state = state;
     // bind parent context to this
@@ -15,13 +30,19 @@ class FormHandler {
     this.context_passthru = context_passthru;
 
     // this.FormMetadata = FormMetadata;
-    this.api_url = api_url;
+    this.api_url = ApiUrl;
     console.log('FormHandler constructor Metadata');
     console.log(FormMetadata);
     this.DefaultFormState = FormMetadata.reduce((state, field) => ({
       ...state,
       [field.name]: field.default || '',
     }), {});
+
+    this.context_passthru.state = {
+      formData: {...this.DefaultFormState},
+      isLoading: false,
+      result: ''
+    };
   }
 
 
@@ -53,21 +74,8 @@ class FormHandler {
     this.context_passthru.setState({ isLoading: true });
     const formData = this.context_passthru.state.formData;
     // Map state values to API specs
-    const requestBody = {
-      building: {
-        bl_id: formData.buildingId,
-        name: {
-          contains: formData.buildingName
-        },
-        banner_name_abrev: formData.bannerName
-      },
-      floor: {
-        fl_id: formData.floorId,
-        name: formData.floorName
-      },
-      flat_file: formData.isFlatFile,
-      file_type: formData.fileType,
-    };
+    const requestBody = this.mapApiForm(formData);
+
     console.log('[DEBUG] request body:');
     console.log(requestBody);
 
