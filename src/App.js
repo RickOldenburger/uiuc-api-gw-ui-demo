@@ -1,12 +1,23 @@
 import './App.css';
 import React from 'react';
 import FormHandler from './helpers/FormHandler';
+const AllPageConfig = require('./pageConfig');
+
+const GetPageConfig = pageName => AllPageConfig[pageName];
+const PageList = Object.keys(AllPageConfig);
+
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.formHandler = new FormHandler(this, 'archibus');
+    const defaultPage = 'archibus';
+    const pageMetadata = GetPageConfig(defaultPage);
+    this.state = {
+      page: defaultPage,
+      pageMetadata
+    };
+    this.formHandler = new FormHandler(this, pageMetadata);
   }
 
   handleFormChange = e => this.formHandler.handleFormChange(e);
@@ -16,6 +27,16 @@ class App extends React.Component {
   renderForm = () => this.formHandler.renderForm();
   jsonListToTable = (jsonList) => this.formHandler.jsonListToTable(jsonList);
   DefaultFormState = () => this.formHandler.DefaultFormState();
+
+  // On page change, update pageMetadata
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.page !== this.state.page) {
+      this.setState({
+        pageMetadata: GetPageConfig(this.state.page),
+        page: this.state.page
+      });
+    }
+  }
 
   render() {
     const rawResult = this.state.result;

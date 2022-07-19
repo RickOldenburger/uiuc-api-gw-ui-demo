@@ -1,9 +1,5 @@
-const allPageConfig = require('../pageConfig');
 class FormHandler {
-  constructor(context_passthru, pageName) {
-    const pageConfig = allPageConfig[pageName];
-    this.mapApiForm = pageConfig.apiFormReqMap;
-
+  constructor(context_passthru, pageConfig) {
     // todo: once refactor works use default form state for init
     // this.context_passthru.state = state;
     // bind parent context to this
@@ -17,15 +13,13 @@ class FormHandler {
     // ugh i really dont wanna do it this way
     this.context_passthru = context_passthru;
 
-    // this.FormMetadata = FormMetadata;
-    this.api_url = pageConfig.apiUrl;
-    this.FormMetadata = pageConfig.formMetadata;
     this.DefaultFormState = pageConfig.formMetadata.reduce((state, field) => ({
       ...state,
       [field.name]: field.default || '',
     }), {});
 
     this.context_passthru.state = {
+      pageConfig,
       formData: {...this.DefaultFormState},
       isLoading: false,
       result: ''
@@ -61,12 +55,12 @@ class FormHandler {
     this.context_passthru.setState({ isLoading: true });
     const formData = this.context_passthru.state.formData;
     // Map state values to API specs
-    const requestBody = this.mapApiForm(formData);
+    const requestBody = this.context_passthru.state.pageConfig.apiFormReqMap(formData);
 
     console.log('[DEBUG] request body:');
     console.log(requestBody);
 
-    fetch(this.api_url, {
+    fetch(this.context_passthru.state.pageConfig.apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -126,7 +120,7 @@ class FormHandler {
    * options?: array
    * @param {array} formMetadata
    */
-  renderForm = (formMetadata = this.FormMetadata) => {
+  renderForm = (formMetadata = this.context_passthru.state.pageConfig.formMetadata) => {
     console.log('renderForm state');
     console.log(' state passthrough');
     console.log(this);

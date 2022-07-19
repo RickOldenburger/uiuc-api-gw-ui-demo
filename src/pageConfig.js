@@ -1,7 +1,20 @@
 // Keep secrets here
 const config = require('./config.json');
+
+// Validation
+const RequiredConfigSchemaKeys = ['url', 'name', 'description', 'apiUrl', 'formMetadata', 'apiFormReqMap'];
+// Form schema validation is a bit extra but I have that json schema format saved outside this repo
+// const RequiredFormKeys = ['name', 'label', 'type'];
+const ValidateSchema = (obj, requiredKeys) => {
+  const keys = Object.keys(obj);
+  const missingKeys = requiredKeys.filter(key => !keys.includes(key));
+  if (missingKeys.length > 0) {
+    throw new Error(`Missing keys in formMetadata: ${missingKeys.join(', ')}`);
+  }
+}
+
 // Details about pages and forms
-module.exports = {
+const pageConfigs = {
   archibus: {
     url: 'archibus',
     name: 'Archibus',
@@ -33,3 +46,10 @@ module.exports = {
     })
   }
 };
+
+// Validate schema for each page
+// Object.keys(pageConfigs).forEach(page => {
+//   ValidateSchema(pageConfigs[page], RequiredConfigSchemaKeys);
+// }
+
+module.exports = {...pageConfigs};
