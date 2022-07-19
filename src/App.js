@@ -30,8 +30,16 @@ class App extends React.Component {
       result: '',
       isLoading: false
      };
-     this.FormHandler = new FormHandler(this.state.formData, FormMetadata);
+     this.formHandler = new FormHandler(this, FormMetadata, azureApiUrl);
   }
+
+  handleFormChange = e => this.formHandler.handleFormChange(e);
+  clearForm = e => this.formHandler.clearForm(e);
+  submitForm = e => this.formHandler.submitForm(e);
+  downloadJsonAsCsv = () => this.formHandler.downloadJsonAsCsv();
+  renderForm = (formMetadata) => this.formHandler.renderForm(formMetadata);
+  jsonListToTable = (jsonList) => this.formHandler.jsonListToTable(jsonList);
+  DefaultFormState = () => this.formHandler.DefaultFormState();
 
   render() {
     const rawResult = this.state.result;

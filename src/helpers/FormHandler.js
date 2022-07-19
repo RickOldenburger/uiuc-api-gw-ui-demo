@@ -1,31 +1,46 @@
 
 class FormHandler {
-  constructor(state, FormMetadata) {
+  constructor(context_passthru, FormMetadata, api_url) {
     // todo: once refactor works use default form state for init
-    this.state = state;
-    this.FormMetadata = FormMetadata;
+    // this.context_passthru.state = state;
+    // bind parent context to this
+    // this.clearForm = this.clearForm.bind(context_passthru);
+    // this.handleFormChange = this.handleFormChange.bind(context_passthru);
+    // this.submitForm = this.submitForm.bind(context_passthru);
+    // this.downloadJsonAsCsv = this.downloadJsonAsCsv.bind(context_passthru);
+    // this.renderForm = this.renderForm.bind(context_passthru);
+    // this.jsonListToTable = this.jsonListToTable.bind(context_passthru);
+
+    // ugh i really dont wanna do it this way
+    this.context_passthru = context_passthru;
+
+    // this.FormMetadata = FormMetadata;
+    this.api_url = api_url;
+    console.log('FormHandler constructor Metadata');
+    console.log(FormMetadata);
+    this.DefaultFormState = FormMetadata.reduce((state, field) => ({
+      ...state,
+      [field.name]: field.default || '',
+    }), {});
   }
 
-  DefaultFormState = this.FormMetadata.reduce((state, field) => ({
-    ...state,
-    [field.name]: field.default || '',
-  }), {});
+
 
   handleFormChange = e => {
-    console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
+    console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.context_passthru.state.formData[e.target.name]}`);
     // console.log(e);
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-    this.setState(prevState => ({
+    this.context_passthru.setState(prevState => ({
       formData: { ...prevState.formData, [name]: value }
     }));
   }
 
   clearForm = e => {
     e.preventDefault();
-    this.setState(prevState => ({
-      formData: DefaultFormState,
+    this.context_passthru.setState(prevState => ({
+      formData: this.DefaultFormState,
       result: ''
     }));
   };
@@ -35,8 +50,8 @@ class FormHandler {
    * TODO if maintaining: dont use callbacks if possible
    */
   submitForm = e => {
-    this.setState({ isLoading: true });
-    const formData = this.state.formData;
+    this.context_passthru.setState({ isLoading: true });
+    const formData = this.context_passthru.state.formData;
     // Map state values to API specs
     const requestBody = {
       building: {
@@ -56,7 +71,7 @@ class FormHandler {
     console.log('[DEBUG] request body:');
     console.log(requestBody);
 
-    fetch(azureApiUrl, {
+    fetch(this.api_url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -64,24 +79,24 @@ class FormHandler {
       body: JSON.stringify(requestBody)
     })
       .then(res => {
-        this.setState({ isLoading: false });
+        this.context_passthru.setState({ isLoading: false });
         console.log(res);
         console.log('test');
         if (res.status >= 300) {
-          this.setState({ result: `${res.status >= 500 ? 'Server ' : ''}Error ${res.status}: ${res.statusText}` });
+          this.context_passthru.setState({ result: `${res.status >= 500 ? 'Server ' : ''}Error ${res.status}: ${res.statusText}` });
         } else {
           res.text().then(text => {
             // if string is array, parse it
             if (text.startsWith('[')) {
               text = JSON.parse(text);
             }
-            this.setState({ result: text });
+            this.context_passthru.setState({ result: text });
           });
         }
       })
       .catch(e => {
         console.log(e);
-        this.setState({ result: e });
+        this.context_passthru.setState({ result: e });
       });
     e.preventDefault();
   };
@@ -91,7 +106,7 @@ class FormHandler {
    * TODO: Handle nested objects
    */
   downloadJsonAsCsv = () => {
-    const data = this.state.result;
+    const data = this.context_passthru.state.result;
     const csv = data.map(item => {
       return Object.keys(item).map(key => {
         return item[key];
@@ -117,6 +132,9 @@ class FormHandler {
    * @param {array} formMetadata
    */
   renderForm = formMetadata => {
+    console.log('renderForm state');
+    console.log(' state passthrough');
+    console.log(this);
     return formMetadata.map(field => (
       <div className="form-group" key={field.name} style={{ visibility: field.visibility || 'visible' }}>
         <label>{field.label} &nbsp;</label>
@@ -125,7 +143,7 @@ class FormHandler {
             name={field.name}
             type="text"
             className="form-control"
-            value={this.state.formData[field.name]}
+            value={this.context_passthru.state.formData[field.name]}
             onChange={this.handleFormChange}
           /> : null
         }
@@ -133,7 +151,7 @@ class FormHandler {
           <select
             name={field.name}
             className="form-control"
-            value={this.state.formData[field.name]}
+            value={this.context_passthru.state.formData[field.name]}
             onChange={this.handleFormChange}
           >
             {field.options.map(option => <option key={option}>{option}</option>)}
@@ -155,7 +173,7 @@ class FormHandler {
     const getCellValue = value => {
       return !value ? '--' : Array.isArray(value) ? JSON.stringify(value) : value;
     }
-    // const getCellValue = this.state.formData.isFlatFile === 'no' ?
+    // const getCellValue = this.context_passthru.state.formData.isFlatFile === 'no' ?
     //   value => {
     //     return !value ? '--' : Array.isArray(value) ? JSON.stringify(value) : value;
     //   } :
