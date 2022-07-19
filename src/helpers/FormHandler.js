@@ -1,3 +1,4 @@
+// TODO: use a proper react child component at some point.. cuz this is kind of wack
 class FormHandler {
   constructor(context_passthru) {
     // todo: once refactor works use default form state for init

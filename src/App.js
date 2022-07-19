@@ -15,6 +15,7 @@ class App extends React.Component {
       page: defaultPage,
       pageConfig
     };
+    // Shouldnt need to be stateful due to passthru context mutating everything inside
     this.formHandler = new FormHandler(this);
   }
 
@@ -49,12 +50,31 @@ class App extends React.Component {
       <h2>{rawResult}</h2> :
       <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
 
+    // render dropdown of page list
+    const pageListDropdown = <select
+      name={this.state.page}
+      value={this.state.page}
+      onChange={e => this.setState.bind(this, { page: e.target.value })}
+    >
+      {
+        PageList.map(page => (
+          <option key={page} value={page}>{page}</option>
+        ))
+      }
+    </select>;
+
     return (
       <div className="App">
         <header className="App-header">
-          <p>
-            API Gateway Portal
+          <div className="flex-item-sm">
+            {/* <img src={logo} className="App-logo" alt="logo" /> */}
+          </div>
+          <p className="flex-item-md">
+            API Gateway Portal Demo
           </p>
+          <div className="flex-item-sm">
+            { pageListDropdown }
+          </div>
         </header>
         <body className='App-body'>
           <div className="disclaimer-header">

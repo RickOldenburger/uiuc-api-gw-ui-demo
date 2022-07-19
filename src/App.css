@@ -17,7 +17,7 @@
   background-color: #282c34;
   /* background-color: #091b60;; UIUC colors, if we want to use that*/
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
@@ -37,15 +37,6 @@
 
 .App-link {
   color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 table, th, td {
@@ -77,4 +68,11 @@ button.download {
 
 button.pad-left {
   margin-left: 1em;
+}
+
+.flex-item-md {
+  flex-grow: 3;
+}
+.flex-item-sm {
+  flex-grow: 1;
 }
