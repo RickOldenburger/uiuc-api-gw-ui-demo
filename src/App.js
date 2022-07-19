@@ -1,43 +1,19 @@
 import './App.css';
 import React from 'react';
-import config from './config.json';
 import FormHandler from './helpers/FormHandler';
 
-const azureApiUrl = config.azure_api_url;
-
-const FormMetadata = [
-  { name: 'buildingId', label: 'Building ID', type: 'text' },
-  { name: 'buildingName', label: 'Building Name', type: 'text' },
-  { name: 'bannerName', label: 'Banner Name', type: 'text' },
-  { name: 'floorId', label: 'Floor ID', type: 'text' },
-  { name: 'floorName', label: 'Floor Name', type: 'text' },
-  { name: 'fileType', label: 'File Type', type: 'dropdown', options: ['json', 'pdf', 'csv'], default: 'json' },
-  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'visible', options: ['yes', 'no'], default: 'yes' }
-];
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    // this.state = { 
-    //   formData: {
-    //     buildingId: '',
-    //     buildingName: '',
-    //     floorId: '',
-    //     floorName: '',
-    //     fileType: 'json',
-    //     isFlatFile: 'yes',
-    //   },
-    //   result: '',
-    //   isLoading: false
-    //  };
-     this.formHandler = new FormHandler(this, FormMetadata, azureApiUrl);
+    this.formHandler = new FormHandler(this, 'archibus');
   }
 
   handleFormChange = e => this.formHandler.handleFormChange(e);
   clearForm = e => this.formHandler.clearForm(e);
   submitForm = e => this.formHandler.submitForm(e);
   downloadJsonAsCsv = () => this.formHandler.downloadJsonAsCsv();
-  renderForm = (formMetadata) => this.formHandler.renderForm(formMetadata);
+  renderForm = () => this.formHandler.renderForm();
   jsonListToTable = (jsonList) => this.formHandler.jsonListToTable(jsonList);
   DefaultFormState = () => this.formHandler.DefaultFormState();
 
@@ -47,7 +23,7 @@ class App extends React.Component {
     const isLoading = this.state.isLoading;
     const showResult = resultHasJson && !isLoading;
     
-    const form = this.renderForm(FormMetadata);
+    const form = this.renderForm();
 
     // TODO: dont rerender table until form is submitted again
     const result = typeof this.state.result === 'string' ?
