@@ -1,5 +1,5 @@
 class FormHandler {
-  constructor(context_passthru, pageConfig) {
+  constructor(context_passthru) {
     // todo: once refactor works use default form state for init
     // this.context_passthru.state = state;
     // bind parent context to this
@@ -12,6 +12,7 @@ class FormHandler {
 
     // ugh i really dont wanna do it this way
     this.context_passthru = context_passthru;
+    const pageConfig = context_passthru.state.pageConfig;
 
     this.DefaultFormState = pageConfig.formMetadata.reduce((state, field) => ({
       ...state,

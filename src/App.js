@@ -6,18 +6,16 @@ const AllPageConfig = require('./pageConfig');
 const GetPageConfig = pageName => AllPageConfig[pageName];
 const PageList = Object.keys(AllPageConfig);
 
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     const defaultPage = 'archibus';
-    const pageMetadata = GetPageConfig(defaultPage);
+    const pageConfig = GetPageConfig(defaultPage);
     this.state = {
       page: defaultPage,
-      pageMetadata
+      pageConfig
     };
-    this.formHandler = new FormHandler(this, pageMetadata);
+    this.formHandler = new FormHandler(this);
   }
 
   handleFormChange = e => this.formHandler.handleFormChange(e);
