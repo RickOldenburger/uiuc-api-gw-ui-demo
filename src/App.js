@@ -32,14 +32,14 @@ class App extends React.Component {
   jsonListToTable = (jsonList) => this.formHandler.jsonListToTable(jsonList);
   DefaultFormState = () => this.formHandler.DefaultFormState();
 
-  // On page change, update pageMetadata
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.page !== this.state.page) {
-      this.setState({
-        pageMetadata: GetPageConfig(this.state.page),
-        page: this.state.page
-      });
-    }
+  // On page change, update config
+
+  selectDropdown = (e) => {
+    const page = e.target.value;
+    this.setState({
+      page: page,
+      pageConfig: GetPageConfig(page)
+    });
   }
 
   render() {
@@ -60,7 +60,7 @@ class App extends React.Component {
       value={this.state.page}
       name="API"
       className="page-list-dropdown"
-      onChange={e => this.setState.bind(this, { page: e.target.value })}
+      onChange={this.selectDropdown}
     >
       {this.pageListOptions}
     </select>;

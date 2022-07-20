@@ -2,7 +2,7 @@
 const config = require('./config.json');
 
 // Validation
-const RequiredConfigSchemaKeys = ['url', 'name', 'description', 'apiUrl', 'formMetadata', 'apiFormReqMap'];
+const RequiredConfigSchemaKeys = ['url', 'displayName', 'description', 'apiUrl', 'formMetadata', 'apiFormReqMap'];
 // Form schema validation is a bit extra but I have that json schema format saved outside this repo
 // const RequiredFormKeys = ['name', 'label', 'type'];
 const ValidateSchema = (obj, requiredKeys) => {
@@ -44,12 +44,31 @@ const pageConfigs = {
       flat_file: formData.isFlatFile,
       file_type: formData.fileType,
     })
+  },
+  aim: {
+    url: 'aim',
+    displayName: 'AIM',
+    description: 'AIM',
+    apiUrl: "",
+    formMetadata: [
+      { name: 'keyId', label: 'Key ID', type: 'text' },
+      { name: 'keyLink', label: 'Key Link', type: 'text' },
+      { name: 'multiTenantId', label: 'Multi-Tenant ID', type: 'text' },
+      { name: 'exactKeyMatch', label: 'Exact Key Match?', type: 'dropdown', options: ['yes', 'no'], default: 'no' }
+    ],
+    apiFormReqMap: formData => ({
+      key_id: [{
+        filter: formData.exactKeyMatch === 'yes' ? 'eq' : 'LIKE',
+        value: formData.keyId
+      }],
+      key_link: formData.keyLink,
+      multi_tenant_id: formData.multiTenantId
+    })
   }
 };
 
-// Validate schema for each page
-// Object.keys(pageConfigs).forEach(page => {
-//   ValidateSchema(pageConfigs[page], RequiredConfigSchemaKeys);
-// }
+Object.keys(pageConfigs).forEach(page => {
+  ValidateSchema(pageConfigs[page], RequiredConfigSchemaKeys);
+});
 
 module.exports = {...pageConfigs};
