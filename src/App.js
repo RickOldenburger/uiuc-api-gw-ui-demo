@@ -18,6 +18,7 @@ class App extends React.Component {
     // Shouldnt need to be stateful due to passthru context mutating everything inside
     this.formHandler = new FormHandler(this);
     // Static due to options being unchanging after initial render
+    //TODO add bigger arrow: &#x25BC;
     this.pageListOptions = PageList.map(page => (
       <option key={page} value={page}>{AllPageConfig[page].displayName}</option>
     ))
@@ -57,11 +58,11 @@ class App extends React.Component {
     // render dropdown of page list
     const pageListDropdown = <select
       value={this.state.page}
-      name={this.state.pageConfig.displayName}
+      name="API"
       className="page-list-dropdown"
       onChange={e => this.setState.bind(this, { page: e.target.value })}
     >
-      { this.pageListOptions }
+      {this.pageListOptions}
     </select>;
 
     return (
@@ -74,6 +75,7 @@ class App extends React.Component {
             API Gateway Portal Demo
           </p>
           <div className="flex-item-sm">
+            <label>Database: &nbsp;</label>
             { pageListDropdown }
           </div>
         </header>
