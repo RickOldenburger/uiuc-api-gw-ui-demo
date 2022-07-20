@@ -17,7 +17,7 @@ const ValidateSchema = (obj, requiredKeys) => {
 const pageConfigs = {
   archibus: {
     url: 'archibus',
-    name: 'Archibus',
+    displayName: 'Archibus',
     description: 'Archibus',
     apiUrl: config.azure_api_url,
     formMetadata: [

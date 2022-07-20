@@ -17,6 +17,10 @@ class App extends React.Component {
     };
     // Shouldnt need to be stateful due to passthru context mutating everything inside
     this.formHandler = new FormHandler(this);
+    // Static due to options being unchanging after initial render
+    this.pageListOptions = PageList.map(page => (
+      <option key={page} value={page}>{AllPageConfig[page].displayName}</option>
+    ))
   }
 
   handleFormChange = e => this.formHandler.handleFormChange(e);
@@ -52,15 +56,12 @@ class App extends React.Component {
 
     // render dropdown of page list
     const pageListDropdown = <select
-      name={this.state.page}
       value={this.state.page}
+      name={this.state.pageConfig.displayName}
+      className="page-list-dropdown"
       onChange={e => this.setState.bind(this, { page: e.target.value })}
     >
-      {
-        PageList.map(page => (
-          <option key={page} value={page}>{page}</option>
-        ))
-      }
+      { this.pageListOptions }
     </select>;
 
     return (
