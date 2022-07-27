@@ -1,4 +1,5 @@
 // TODO: use a proper react child component at some point.. cuz this is kind of wack
+
 class FormHandler {
   constructor(context_passthru) {
     // todo: once refactor works use default form state for init
@@ -15,14 +16,10 @@ class FormHandler {
     this.context_passthru = context_passthru;
     const pageConfig = context_passthru.state.pageConfig;
 
-    this.DefaultFormState = pageConfig.formMetadata.reduce((state, field) => ({
-      ...state,
-      [field.name]: field.default || '',
-    }), {});
 
     this.context_passthru.state = {
       pageConfig,
-      formData: {...this.DefaultFormState},
+      formData: {...pageConfig.defaultFormData},
       isLoading: false,
       result: ''
     };
@@ -44,7 +41,7 @@ class FormHandler {
   clearForm = e => {
     e.preventDefault();
     this.context_passthru.setState(prevState => ({
-      formData: this.DefaultFormState,
+      formData: this.context_passthru.state.pageConfig.defaultFormData,
       result: ''
     }));
   };
@@ -150,6 +147,73 @@ class FormHandler {
         }
       </div>
     ));
+  }
+
+  // _xmlToTable = (xmlStr) => {
+  //   if (!xmlStr || !xmlStr.length) return '';
+  //   console.log('[DEBUG] xmlToTable');
+  //   console.log(xmlStr);
+
+  //   const parser = new DOMParser();
+  //   const xml = parser.parseFromString(xmlStr, "text/xml");
+  //   // Convert to HTML table
+  //   // const table = document.createElement('table');
+  //   // table.className = 'table table-striped';
+  //   // table.innerHTML = `<thead><tr>${xml.getElementsByTagName('column').map(col => `<th>${col.innerHTML}</th>`).join('')}</tr></thead>`;
+  //   // table.innerHTML += `<tbody>
+  //   // ${xml.getElementsByTagName('row').map(row => `<tr>${row.innerHTML.split('<column>').map(col => `<td>${col}</td>`).join('')}</tr>`).join('')}
+  //   // </tbody>`;
+  //   // TODO: Do not make this specific to AIMS WIP
+  //   const xmlNodesAsList = xml.getElementsByTagName('TableName');
+  //   // Get values from Node list
+  //   const tableName = xmlNodesAsList[0].innerHTML;
+
+  //   const xmlNodesAsList2 = xml.getElementsByTagName('Columns');
+  //   // Get values from Node list
+  //   const columns = xmlNodesAsList2[0].innerHTML.split('<Column>').map(col => col.split('</Column>')[0]);
+  //   console.log('[DEBUG] columns');
+
+  //   for (i = 0; i < x.length; i++) {
+  //     txt += x[i].childNodes[0].nodeValue;
+  //   }
+  //   document.getElementById("demo").innerHTML = txt; 
+  //   return (
+  //     <table>
+  //       <thead>
+  //         <tr>
+  //           {xmlNodesAsList.map(col => <th>${col.innerHTML}</th>)}
+  //         </tr>
+  //       </thead>
+  //       <tbody>
+  //         {xml.getElementsByTagName('row').map(row => <tr key={row.id}>
+  //           {row.innerHTML.split('<column>').map(col => <td>{col}</td>)}
+  //         </tr>)}
+  //       </tbody>
+  //     </table>
+  //   );
+
+  //   // const items = xmlStr.find('NewDataSet');
+  //   // console.log('== [DEBUG] items ==');
+  //   // console.log(items);
+  // }
+    
+  xmlToTable = (xmlStr) => {
+    console.log(xmlStr);
+    function convertXmlToJson(xmlString) {
+      const jsonData = {};
+      for (const result of xmlString.matchAll(/(?:<(\w*)(?:\s[^>]*)*>)((?:(?!<\1).)*)(?:<\/\1>)|<(\w*)(?:\s*)*\/>/gm)) {
+        const key = result[1] || result[3];
+        const value = result[2] && convertXmlToJson(result[2]); //recusrion
+        jsonData[key] = ((value && Object.keys(value).length) ? value : result[2]) || null;
+      }
+      return jsonData;
+    }
+    const res = convertXmlToJson(xmlStr);
+    console.log('=======================================================');
+    console.log(res)
+    const jsonTable = this.jsonListToTable([res]);
+    console.log(jsonTable);
+    return jsonTable;
   }
 
   jsonListToTable = jsonList => {

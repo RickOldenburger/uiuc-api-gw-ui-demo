@@ -30,15 +30,17 @@ class App extends React.Component {
   downloadJsonAsCsv = () => this.formHandler.downloadJsonAsCsv();
   renderForm = () => this.formHandler.renderForm();
   jsonListToTable = (jsonList) => this.formHandler.jsonListToTable(jsonList);
-  DefaultFormState = () => this.formHandler.DefaultFormState();
+  xmlToTable = xml => this.formHandler.xmlToTable(xml);
 
   // On page change, update config
 
   selectDropdown = (e) => {
     const page = e.target.value;
+    const pageConfig = GetPageConfig(page);
     this.setState({
       page: page,
-      pageConfig: GetPageConfig(page)
+      pageConfig,
+      formData: {...pageConfig.defaultFormData}
     });
   }
 
@@ -50,11 +52,18 @@ class App extends React.Component {
     
     const form = this.renderForm();
 
-    // TODO: dont rerender table until form is submitted again
-    const result = typeof this.state.result === 'string' ?
-      <h2>{rawResult}</h2> :
-      <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
+    // console.log('[DEBUG] Results');
+    // console.log(this.state.result[0]);
+    // console.log(rawResult[0]);
 
+    // TODO: dont rerender table until form is submitted again
+    const result = this.state.result[0] === '<' ?
+        <h3>{this.xmlToTable(this.state.result)}</h3>
+      : typeof this.state.result === 'string' ?
+        <h2>{rawResult}</h2>
+      : <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
+
+    console.log(result);
     // render dropdown of page list
     const pageListDropdown = <select
       value={this.state.page}
@@ -68,7 +77,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <div className="flex-item-sm">
+          <div className="flex-item-md">
             {/* <img src={logo} className="App-logo" alt="logo" /> */}
           </div>
           <p className="flex-item-md">

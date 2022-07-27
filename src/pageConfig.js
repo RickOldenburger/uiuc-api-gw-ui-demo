@@ -13,15 +13,22 @@ const ValidateSchema = (obj, requiredKeys) => {
   }
 }
 
+const GetDefaultState = _this => {
+  return _this.formMetadata.reduce((state, field) => ({
+    ...state,
+    [field.name]: field.default || '',
+  }), {});
+}
+
 // Details about pages and forms
 const pageConfigs = {
   archibus: {
     url: 'archibus',
     displayName: 'Archibus',
     description: 'Archibus',
-    apiUrl: config.azure_api_url,
+    apiUrl: config.archibus_api_url,
     formMetadata: [
-      { name: 'buildingId', label: 'Building ID', type: 'text' },
+      { name: 'buildingId', label: 'Building ID', type: 'text', default: '0076' },
       { name: 'buildingName', label: 'Building Name', type: 'text' },
       { name: 'bannerName', label: 'Banner Name', type: 'text' },
       { name: 'floorId', label: 'Floor ID', type: 'text' },
@@ -49,26 +56,31 @@ const pageConfigs = {
     url: 'aim',
     displayName: 'AIM',
     description: 'AIM',
-    apiUrl: "",
+    apiUrl: config.aim_api_url,
     formMetadata: [
-      { name: 'keyId', label: 'Key ID', type: 'text' },
-      { name: 'keyLink', label: 'Key Link', type: 'text' },
-      { name: 'multiTenantId', label: 'Multi-Tenant ID', type: 'text' },
+      { name: 'keyId', label: 'Key ID', type: 'text', default: '0001-' },
+      { name: 'keyLink', label: 'Key Link', type: 'text', default: 'B' },
+      { name: 'multiTenantId', label: 'Multi-Tenant ID', type: 'text', default: '1' },
       { name: 'exactKeyMatch', label: 'Exact Key Match?', type: 'dropdown', options: ['yes', 'no'], default: 'no' }
     ],
-    apiFormReqMap: formData => ({
-      key_id: [{
-        filter: formData.exactKeyMatch === 'yes' ? 'eq' : 'LIKE',
-        value: formData.keyId
-      }],
-      key_link: formData.keyLink,
-      multi_tenant_id: formData.multiTenantId
-    })
+    apiFormReqMap: formData => {
+      const hasExactKeyMatch = formData.exactKeyMatch === 'yes';
+      return ({
+        KEY_ID: [{
+          FILTER: hasExactKeyMatch ? '=' : 'LIKE',
+          VALUE: hasExactKeyMatch ? formData.keyId : `%${formData.keyId}%`
+        }],
+        KEY_LINK: formData.keyLink,
+        MULTI_TENANT_ID: formData.multiTenantId
+      })
+    }
   }
 };
 
 Object.keys(pageConfigs).forEach(page => {
-  ValidateSchema(pageConfigs[page], RequiredConfigSchemaKeys);
+  const pageConfig = pageConfigs[page];
+  ValidateSchema(pageConfig, RequiredConfigSchemaKeys);
+  pageConfig.defaultFormData = GetDefaultState(pageConfig);
 });
 
 module.exports = {...pageConfigs};
